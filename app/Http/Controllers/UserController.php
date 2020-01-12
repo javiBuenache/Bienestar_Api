@@ -34,7 +34,24 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $user = new User();
+
+        if (!$user->is_email_in_use($request->email)){
+            $user->register($request);
+            $data_token = [
+                "email" => $user->email,
+            ];
+            $token = new Token($data_token);
+            
+            $tokenEncoded = $token->encode();
+            return response()->json([
+                "token" => $tokenEncoded
+            ], 201);
+        }else
+        {
+            return response()->json(["Error" => "Tiene que rellenar los campos"]);
+        }
     }
 
     /**

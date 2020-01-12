@@ -18,7 +18,7 @@ class User extends Model
         $user->email = $request->email;
         $user->save();
     }
-    public static function isEmailInUse($email)
+    public static function is_email_in_use($email)
     {  
         $users = User::where('email', $email)->get();
 
