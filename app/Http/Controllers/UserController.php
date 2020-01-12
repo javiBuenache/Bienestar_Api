@@ -12,6 +12,13 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        if ($request->email == null || $request->password == null) 
+        {
+            return response()->json([
+                'alert' => 'Error: Inserte un email y un password'],
+                400
+            );
+        }
         $data_token = ['email'=>$request->email];
         
         $user = User::where($data_token)->first();  
@@ -27,6 +34,45 @@ class UserController extends Controller
         }     
         return response()->json(["Error" => "No se ha encontrado"], 401);
     }
+
+    public function recuperate_password(Request $request)
+    {
+        $user = User::where('email',$request->email)->first();  
+
+        if (isset($user)) 
+        {   
+            $newPassword = self::randomPassword();
+            self::sendEmail($user->email,$newPassword);
+            $user->password = $newPassword;
+            $user->update();
+            return response()->json(["Success" => "contraseña nueva"]);
+        }else
+        {
+            return response()->json(["Error" => "no existe email"]);
+        }
+    }
+    public function sendEmail($email,$newPassword)
+    {
+        $to     =  $email;
+        $subjet    = 'Recuperar contraseña';
+        $message   = 'Su nueva contraseña es: "'.$newPassword.'"';
+        //print($mensaje);exit();
+        mail($to, $subjet, $message);
+    }
+    
+    public function randomPassword() 
+    {
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwz1234567890';
+        $pass = array(); 
+        $alphaLength = strlen($alphabet) - 1; 
+        for ($i = 0; $i < 10; $i++) 
+        {
+            $n = rand(0, $alphaLength);
+            $pass[] = $alphabet[$n];
+        }
+        return implode($pass);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -55,6 +101,14 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        
+        if ($request->name == null || $request->email == null || $request->password == null) 
+        {
+            return response()->json([
+                'alert' => 'Error: Inserte un nonbre, un email y un password'],
+                400
+         );
+        }
 
         $user = new User();
 
