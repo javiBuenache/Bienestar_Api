@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Application;
+use App\User;
 
 class AppController extends Controller
 {
@@ -34,7 +36,15 @@ class AppController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $app = new App();
+        $app->icon = $request->icon;
+        $app->name = $request->name;
+        $app->save();
+  
+        return response()->json([
+                
+            "message" => "app creada"
+        ], 200);
     }
 
     /**
