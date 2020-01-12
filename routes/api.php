@@ -19,6 +19,7 @@ Route::post('login','UserController@login');
 Route::apiResource('applications', 'AppController');
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::apiResource('users', 'UserController');
     Route::post('import_CSV', 'UserController@import_CSV');
     
 }); 

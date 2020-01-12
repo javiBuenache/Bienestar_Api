@@ -76,9 +76,9 @@ class UserController extends Controller
     public function import_CSV(Request $request)
     {
         $request_user = $request->user; 
-        $csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/Bienestar-CSV/usage.csv'));   
+        $array_csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/Bienestar-CSV/usage.csv'));   
 
-        foreach ($sv as $key => $column) 
+        foreach ($array_csv as $key => $column) 
         {                 
             if($key != 0)
             {
@@ -93,7 +93,6 @@ class UserController extends Controller
                     'longitude' => $column[4],
                 ]); 
             }
-    
         }
     }
 
@@ -200,7 +199,6 @@ class UserController extends Controller
 
         if (isset($user)) 
         {
-            
             $user->name = $request->name;
             $user->password = $request->password;
             $user->update();

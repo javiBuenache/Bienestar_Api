@@ -14,8 +14,8 @@ class Application extends Model
     public function register_app(Request $request)
     {
         $application = new Application();
-        $application->icon = $request->name;
-        $application->name = $request->icon;
+        $application->icon = $request->icon;
+        $application->name = $request->name;
         $application->save();
     }
     
