@@ -13,7 +13,8 @@ class CreateUserHaveApplicationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_have_applications', function (Blueprint $table) {
+        Schema::create('user_have_applications', function (Blueprint $table) 
+        {
             $table->primary(['user_id','app_id','date']);
 
             $table->unsignedInteger('user_id');
@@ -21,7 +22,7 @@ class CreateUserHaveApplicationsTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('app_id')->references('id')->on('applications')->onDelete('cascade');
-            
+
             $table->dateTime('date'); 
             $table->string('event');           
             $table->integer('latitude');

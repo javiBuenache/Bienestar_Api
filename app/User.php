@@ -2,29 +2,46 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use Notifiable;
+    protected $table = 'users';
+    protected $fillable = ['name','email','password'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
+    public function register(Request $request)
+    {
+        $user = new User;
+        $user->name = $request->name;
+        $user->password = $request->password;
+        $user->email = $request->email;
+        $user->save();
+    }
+    public static function isEmailInUse($email)
+    {  
+        $users = User::where('email', $email)->get();
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+        foreach ($users as $key => $value) 
+        {
+            if ($value->email == $email) 
+            {
+                return true; 
+            }
+            return false;
+        }
+    }
+
+    public function apps()
+    {
+        return $this->belongsToMany('App\Application', 'user_have_applications')
+                    ->withPivot('date', 'event', 'latitude', 'longitude',)                    
+                    ->withTimestamps();
+    }
+    public function usages_apps()
+    {
+        return $this->belongsToMany('App\Application', 'user_usage_applications')
+                    ->withPivot('max_time', 'start_time', 'finish_time',) 
+                    ->withTimestamps();
+    }
 }
