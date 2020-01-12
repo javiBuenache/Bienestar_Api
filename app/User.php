@@ -14,8 +14,8 @@ class User extends Model
     {
         $user = new User;
         $user->name = $request->name;
-        $user->password = $request->password;
         $user->email = $request->email;
+        $user->password = $request->password;
         $user->save();
     }
     public static function is_email_in_use($email)

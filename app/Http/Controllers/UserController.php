@@ -3,9 +3,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
+use App\Aplication;
+use App\Helpers\Token;
 
 class UserController extends Controller
 {
+
+    public function login(Request $request)
+    {
+        $data_token = ['email'=>$request->email];
+        
+        $user = User::where($data_token)->first();  
+       
+        if ($user!=null) 
+        {       
+            if($request->password == $user->password)
+            {       
+                $token = new Token($data_token);
+                $token_coded = $token->encode();
+                return response()->json(["token" => "usuario correcto", $token_coded], 201);
+            }   
+        }     
+        return response()->json(["Error" => "No se ha encontrado"], 401);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -44,13 +65,13 @@ class UserController extends Controller
             ];
             $token = new Token($data_token);
             
-            $tokenEncoded = $token->encode();
+            $token_coded = $token->encode();
             return response()->json([
-                "token" => $tokenEncoded
+                "token" => $token_coded
             ], 201);
         }else
         {
-            return response()->json(["Error" => "Tiene que rellenar los campos"]);
+            return response()->json(["Error" => "El email ya existe"]);
         }
     }
 
