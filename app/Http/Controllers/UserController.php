@@ -185,7 +185,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = user::where('email',$request->data_token->email)->first();
-        
+
         if (isset($user)) 
         {
             
@@ -199,7 +199,7 @@ class UserController extends Controller
             return response()->json(["Error" => "El usuario no existe"]);
         }
     }
-    }
+    
 
     /**
      * Remove the specified resource from storage.
@@ -209,6 +209,20 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $email = $request->data_token->email;
+        $user = User::where('email',$email)->first();
+
+        if (isset($user))
+         {            
+            if ($request->password == $user->password) 
+            {
+               $user->delete();            
+                return response()->json(["Success" => "Se ha borrado el usuario."]);
+            }else{
+                return response()->json(["Error" => "la contraseña no coincide"]);
+            }
+        }else{
+            return response()->json(["Error" => "El ususario no existe"]);
+        }
     }
 }
