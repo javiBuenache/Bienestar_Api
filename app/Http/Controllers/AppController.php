@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Application;
-use App\User;
+
 
 class AppController extends Controller
 {
@@ -36,15 +36,17 @@ class AppController extends Controller
      */
     public function store(Request $request)
     {
-        $app = new Application();
-        $app->icon = $request->icon;
-        $app->name = $request->name;
-        $app->save();
-  
-        return response()->json([
-                
-            "message" => "app creada"
-        ], 200);
+        $application = new Application();
+
+        if(!$application->in_use_app($request->name))
+        {
+            $application->register_app($request);
+
+            return response()->json(["Success" => "Se ha añadido la aplicacion."]);
+        }else
+        {
+            return response()->json(["Error" => "La aplicacion ya existe"]);
+        }
     }
 
     /**
@@ -55,7 +57,16 @@ class AppController extends Controller
      */
     public function show($id)
     {
-        //
+        $application = new Application();
+        $applications = $application->get_App();
+
+        if(isset($applications))
+        {
+           
+            return response()->json(["Success" => $applications]);
+        }else{
+            return response()->json(["Error" => "No hay aplicaciones"]);
+        }
     }
 
     /**
@@ -78,7 +89,19 @@ class AppController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $application = Application::where('name',$request->name)->first();
+
+        if (isset($application)) 
+        {
+            $application->icon = $request->icon;
+            $application->name = $request->name;
+            $application->update();
+        
+            return response()->json(["Success" =>  "Modificado la aplicacion."]);
+        }else
+        {
+            return response()->json(["Error" => "La aplicacion no existe"]);
+        }
     }
 
     /**
@@ -89,6 +112,17 @@ class AppController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $application = Application::where('name',$request->name)->first();
+
+        if (isset($application)) 
+        {
+            $application->delete();
+        
+            return response()->json(["Success" => "Se ha borrado la aplicacion."]);
+        }else
+        {
+
+            return response()->json(["Error" => "La aplicacion no existe"]);
+        }
     }
 }
