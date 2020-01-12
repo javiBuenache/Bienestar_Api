@@ -161,7 +161,19 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $email = $request->data_token->email;
+
+        $user = User::where('email',$email)->first();
+
+        if(isset($user))
+        {
+            $user->password = $user->password;
+
+            return response()->json(["Success" => $user]);
+        }else
+        {
+            return response()->json(["Error" => "El ususario no existe"]);
+        }
     }
 
     /**
