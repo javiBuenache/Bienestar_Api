@@ -36,7 +36,7 @@ class AppController extends Controller
      */
     public function store(Request $request)
     {
-        $app = new App();
+        $app = new Application();
         $app->icon = $request->icon;
         $app->name = $request->name;
         $app->save();

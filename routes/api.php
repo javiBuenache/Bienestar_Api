@@ -16,3 +16,9 @@ use Illuminate\Http\Request;
 
 Route::post('register', 'UserController@store');
 Route::post('login','UserController@login');
+Route::apiResource('applications', 'AppController');
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::post('import_CSV', 'UserController@import_CSV');
+    
+}); 

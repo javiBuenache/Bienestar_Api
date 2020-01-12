@@ -35,13 +35,13 @@ class User extends Model
     public function apps()
     {
         return $this->belongsToMany('App\Application', 'user_have_applications')
-                    ->withPivot('date', 'event', 'latitude', 'longitude',)                    
+                    ->withPivot('date', 'event', 'latitude', 'longitude')                    
                     ->withTimestamps();
     }
     public function usages_apps()
     {
         return $this->belongsToMany('App\Application', 'user_usage_applications')
-                    ->withPivot('max_time', 'start_time', 'finish_time',) 
+                    ->withPivot('max_time', 'start_time', 'finish_time') 
                     ->withTimestamps();
     }
 }

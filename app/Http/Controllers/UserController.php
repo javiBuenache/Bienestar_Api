@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Aplication;
+use App\Application;
 use App\Helpers\Token;
 
 class UserController extends Controller
@@ -71,6 +71,30 @@ class UserController extends Controller
             $pass[] = $alphabet[$n];
         }
         return implode($pass);
+    }
+
+    public function import_CSV(Request $request)
+    {
+        $request_user = $request->user; 
+        $csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/Bienestar-CSV/usage.csv'));   
+
+        foreach ($sv as $key => $column) 
+        {                 
+            if($key != 0)
+            {
+                $name = $column[1];             
+                $app = Application::where('name', '=', $name)->first();
+                
+                $request_user->apps()->attach($app->id, 
+                [
+                    'date' => $column[0], 
+                    'event' => $column[2],                      
+                    'latitude' => $column[3],
+                    'longitude' => $column[4],
+                ]); 
+            }
+    
+        }
     }
 
     /**
@@ -160,7 +184,21 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = user::where('email',$request->data_token->email)->first();
+        
+        if (isset($user)) 
+        {
+            
+            $user->name = $request->name;
+            $user->password = $request->password;
+            $user->update();
+        
+            return response()->json(["Success" => "Se ha modificado el usuario."]);
+        }else
+        {
+            return response()->json(["Error" => "El usuario no existe"]);
+        }
+    }
     }
 
     /**

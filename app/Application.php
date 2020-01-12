@@ -13,7 +13,7 @@ class Application extends Model
        
     public function register_app(Request $request)
     {
-        $application = new application;
+        $application = new Application();
         $application->icon = $request->name;
         $application->name = $request->icon;
         $application->save();
@@ -40,14 +40,14 @@ class Application extends Model
     public function users()
     {
         return $this->belongsToMany('App\User', 'user_have_applications')
-                    ->withPivot('date', 'event', 'latitude', 'longitude',) 
+                    ->withPivot('date', 'event', 'latitude', 'longitude') 
                     ->withTimestamps();                    
     }
     
     public function users_usages()
     {
         return $this->belongsToMany('App\Application', 'user_usage_applications')
-                    ->withPivot('max_time', 'start_time', 'finish_time',) 
+                    ->withPivot('max_time', 'start_time', 'finish_time') 
                     ->withTimestamps();
     }
 }
