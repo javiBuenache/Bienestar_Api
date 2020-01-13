@@ -259,11 +259,12 @@ class UserController extends Controller
         
        $request_user = User::where('email', $user_email)->first();
 
-        if (isset($user))
+        if (isset($request_user))
          {            
             if ($request->password == encrypt($request->password)) 
             {
-               $request_user->delete();            
+               $request_user->delete();    
+
                 return response()->json(["Success" => "Se ha borrado el usuario."]);
             }else
             {

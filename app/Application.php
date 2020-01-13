@@ -25,7 +25,8 @@ class Application extends Model
         
         foreach ($applications as $key => $value)
          {
-            if($value->name == $name){
+            if($value->name == $name)
+            {
                 return true;
             }
         }
