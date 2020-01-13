@@ -75,17 +75,22 @@ class UserController extends Controller
 
     public function import_CSV(Request $request)
     {
-        $request_user = $request->user; 
-        $array_csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/Bienestar-CSV/usage.csv'));   
-
-        foreach ($array_csv as $key => $column) 
+        //$request_user = $request->user; 
+        $data_token = ['email'=>$request->email];
+        
+        $user = User::where($data_token)->first(); 
+        $csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/CSV-Bienestar/usage.csv'));   
+        $array_number= count($csv);
+        //var_dump($csv); exit;
+        
+        foreach ($csv as $array_number => $column) 
         {                 
-            if($key != 0)
+            if($array_number != 0)
             {
                 $name = $column[1];             
                 $app = Application::where('name', '=', $name)->first();
                 
-                $request_user->apps()->attach($app->id, 
+                $user->apps()->attach($app->id, 
                 [
                     'date' => $column[0], 
                     'event' => $column[2],                      
@@ -158,7 +163,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $email = $request->data_token->email;
 
@@ -217,7 +222,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $email = $request->data_token->email;
         $user = User::where('email',$email)->first();
