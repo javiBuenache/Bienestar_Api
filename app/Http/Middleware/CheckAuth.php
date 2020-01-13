@@ -14,23 +14,19 @@ class CheckAuth
      * @param  \Closure  $next
      * @return mixed
      */
+   
     public function handle($request, Closure $next)
     {
-        $header_token = $request->header('Authorization');
-
-        if(isset($header_token))
+        $user = new User();
+        if ($user->is_authorized($request)) 
         {
+            $header = $request->header("Authorization");    
             $token = new Token();
-            $decode_token = $token->decode($header_token);
-            $user= User::where('email', $decode_token)->first();
-
-            if(isset($user))
-            {
-                $request->request->add(['user' => $user]);
-                return $next($request);
-            }
+            $decodedToken = $token->decode($header);
+            $request->request->add(['data' => $decodedToken]);
+            return $next($request);
         }
-        return response()->json(['Message' => 'No tiene permisos'], 401);
+        return response()->json(['message' => 'Error, no tiene los permisos'], 401);
     }
 }
 

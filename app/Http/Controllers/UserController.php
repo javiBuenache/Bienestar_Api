@@ -7,6 +7,7 @@ use App\User;
 use App\Application;
 use App\Helpers\Token;
 
+
 class UserController extends Controller
 {
 
@@ -19,25 +20,39 @@ class UserController extends Controller
                 400
             );
         }
-        $data_token = ['email'=>$request->email];
-        
-        $user = User::where($data_token)->first();  
        
+        $user = User::where('email', '=', $request->email)->first();
+
         if ($user!=null) 
-        {       
-            if($request->password == $user->password)
-            {       
-                $token = new Token($data_token);
-                $token_coded = $token->encode();
-                return response()->json(["token" => "usuario correcto", $token_coded], 201);
-            }   
-        }     
-        return response()->json(["Error" => "No se ha encontrado"], 401);
+        {      
+            $decrypted_user_password = decrypt($user->password);
+        }else
+        {
+            return response()->json([
+                "message" => "datos incorrectos",
+            ], 401);
+        }
+        if($decrypted_user_password == $request->password)
+        {
+            $token = new Token(["email" => $user->email]);
+            $coded_token = $token->encode();
+            return response()->json([
+                
+                "token" => 'Usuario logueado: "'.$coded_token.'"',
+            ], 200);
+        }else
+        {
+            return response()->json([
+                "message" => "datos incorrectos",
+            ], 401);
+        }
     }
 
     public function recuperate_password(Request $request)
     {
-        $user = User::where('email',$request->email)->first();  
+        $user_email = $request->data->email;
+
+        $user = User::where('email',$user_email)->first();  
 
         if (isset($user)) 
         {   
@@ -75,10 +90,10 @@ class UserController extends Controller
 
     public function import_CSV(Request $request)
     {
-        //$request_user = $request->user; 
-        $data_token = ['email'=>$request->email];
+        $user_email = $request->data->email;
         
-        $user = User::where($data_token)->first(); 
+        $request_user = User::where('email', $user_email)->first();
+       
         $csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/CSV-Bienestar/usage.csv'));   
         $array_number= count($csv);
         //var_dump($csv); exit;
@@ -87,15 +102,16 @@ class UserController extends Controller
         {                 
             if($array_number != 0)
             {
-                $name = $column[1];             
+                $name = $column[1];          
                 $app = Application::where('name', '=', $name)->first();
-                
-                $user->apps()->attach($app->id, 
+                  //var_dump($column[1]); exit;     
+                $request_user->apps()->attach(
+                    $app->id, 
                 [
                     'date' => $column[0], 
                     'event' => $column[2],                      
                     'latitude' => $column[3],
-                    'longitude' => $column[4],
+                    'longitude' => $column[4]
                 ]); 
             }
         }
@@ -171,7 +187,7 @@ class UserController extends Controller
 
         if(isset($user))
         {
-            $user->password = $user->password;
+            $user->password = encrypt($request->password);
 
             return response()->json(["Success" => $user]);
         }else
@@ -200,19 +216,34 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = user::where('email',$request->data_token->email)->first();
-
-        if (isset($user)) 
-        {
-            $user->name = $request->name;
-            $user->password = $request->password;
-            $user->update();
+        $user_email = $request->data->email;
         
-            return response()->json(["Success" => "Se ha modificado el usuario."]);
-        }else
+        $request_user = User::where('email', $user_email)->first();
+
+        $user_id = $request_user->id;
+
+        if($user_id!=$id)
         {
-            return response()->json(["Error" => "El usuario no existe"]);
+            return response()->json([
+                "message" => 'Error, solo puedes editar tu usuario'
+            ],401);
         }
+
+        if($request->name==NULL || $request->email==NULL || $request->password==NULL)
+        {
+            return response()->json([
+                "message" => 'Debes rellenar todos los campos'
+            ],401);
+        }
+
+        $request_user->name = $request->name;
+        $request_user->email = $request->email;
+        $request_user->password = encrypt($request->password);
+        $request_user->save();
+
+        return response()->json([
+            "message" => 'Actualizados los nuevos datos'
+        ],200);
     }
     
 
@@ -224,19 +255,22 @@ class UserController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $email = $request->data_token->email;
-        $user = User::where('email',$email)->first();
+       $user_email = $request->data->email;
+        
+       $request_user = User::where('email', $user_email)->first();
 
         if (isset($user))
          {            
-            if ($request->password == $user->password) 
+            if ($request->password == encrypt($request->password)) 
             {
-               $user->delete();            
+               $request_user->delete();            
                 return response()->json(["Success" => "Se ha borrado el usuario."]);
-            }else{
+            }else
+            {
                 return response()->json(["Error" => "la contraseña no coincide"]);
             }
-        }else{
+        }else
+        {
             return response()->json(["Error" => "El ususario no existe"]);
         }
     }

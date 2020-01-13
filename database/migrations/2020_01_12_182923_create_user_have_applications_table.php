@@ -25,8 +25,8 @@ class CreateUserHaveApplicationsTable extends Migration
 
             $table->dateTime('date'); 
             $table->string('event');           
-            $table->integer('latitude');
-            $table->integer('longitude');
+            $table->double('latitude', 8, 6);
+            $table->double('longitude', 8, 6);
             $table->timestamps();
         });
     }

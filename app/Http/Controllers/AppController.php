@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Application;
 
 
+
 class AppController extends Controller
 {
     /**
