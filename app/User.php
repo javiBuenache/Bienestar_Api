@@ -45,6 +45,7 @@ class User extends Model
     {
         $token = new Token();
         $header = $request->header("Authorization");    
+        
         if (!isset($header)) {
             return false;
         }

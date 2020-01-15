@@ -17,7 +17,7 @@ class UserController extends Controller
         {
             return response()->json([
                 'alert' => 'Error: Inserte un email y un password'],
-                400
+                401
             );
         }
        
@@ -44,7 +44,7 @@ class UserController extends Controller
         {
             return response()->json([
                 "message" => "datos incorrectos",
-            ], 401);
+            ], 400);
         }
     }
 
@@ -169,7 +169,7 @@ class UserController extends Controller
             ], 201);
         }else
         {
-            return response()->json(["Error" => "El email ya existe"]);
+            return response()->json(["Error" => "El email ya existe"],400);
         }
     }
 
