@@ -188,10 +188,10 @@ class UserController extends Controller
         {
             $user->password = encrypt($request->password);
 
-            return response()->json(["Success" => $user]);
+            return response()->json(["Success" => $user],200);
         }else
         {
-            return response()->json(["Error" => "El ususario no existe"]);
+            return response()->json(["Error" => "El ususario no existe"],401);
         }
     }
 
