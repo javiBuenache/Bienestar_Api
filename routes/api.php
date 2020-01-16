@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 
 Route::post('register', 'UserController@store');
 Route::post('login','UserController@login');
+Route::post('recuperate_password','UserController@recuperate_password');
 Route::apiResource('applications', 'AppController');
 
 Route::group(['middleware' => ['auth']], function () {

@@ -26,6 +26,7 @@ class UserController extends Controller
         if ($user!=null) 
         {      
             $decrypted_user_password = decrypt($user->password);
+            //var_dump($decrypted_user_password);exit;
         }else
         {
             return response()->json([
@@ -50,27 +51,25 @@ class UserController extends Controller
 
     public function recuperate_password(Request $request)
     {
-        $user_email = $request->data->email;
-
-        $user = User::where('email',$user_email)->first();  
-
+        $user = User::where('email', '=', $request->email)->first(); 
+        
         if (isset($user)) 
-        {   
+        {  
             $newPassword = self::randomPassword();
             self::sendEmail($user->email,$newPassword);
-            $user->password = $newPassword;
+            $user->password = encrypt($newPassword);
             $user->update();
-            return response()->json(["Success" => "contraseña nueva"]);
+            return response()->json(["Success" => "contrasena nueva"],200);
         }else
         {
-            return response()->json(["Error" => "no existe email"]);
+            return response()->json(["Error" => "no existe email"],400);
         }
     }
     public function sendEmail($email,$newPassword)
     {
         $to     =  $email;
         $subjet    = 'Recuperar contraseña';
-        $message   = 'Su nueva contraseña es: "'.$newPassword.'"';
+        $message   = 'Su nueva contrasena es: "'.$newPassword.'"';
         //print($mensaje);exit();
         mail($to, $subjet, $message);
     }
