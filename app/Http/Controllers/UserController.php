@@ -180,10 +180,10 @@ class UserController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $email = $request->data_token->email;
-
-        $user = User::where('email',$email)->first();
-
+        $user_email = $request->data->email;
+        
+        $user = User::where('email', '=', $user_email)->first(); 
+      
         if(isset($user))
         {
             $user->password = encrypt($request->password);
