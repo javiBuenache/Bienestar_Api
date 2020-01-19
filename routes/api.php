@@ -21,5 +21,6 @@ Route::apiResource('applications', 'AppController');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::apiResource('users', 'UserController');
-    Route::post('import_CSV', 'UserController@import_CSV');
+    Route::post('change_password','UserController@change_password');
+    
 }); 

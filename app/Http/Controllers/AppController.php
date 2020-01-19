@@ -43,10 +43,10 @@ class AppController extends Controller
         {
             $application->register_app($request);
 
-            return response()->json(["Success" => "Se ha añadido la aplicacion."]);
+            return response()->json(["Success" => "Se ha añadido la aplicacion."],200);
         }else
         {
-            return response()->json(["Error" => "La aplicacion ya existe"]);
+            return response()->json(["Error" => "La aplicacion ya existe"],401);
         }
     }
 

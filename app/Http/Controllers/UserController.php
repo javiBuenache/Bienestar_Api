@@ -165,10 +165,10 @@ class UserController extends Controller
             $token_coded = $token->encode();
             return response()->json([
                 "token" => $token_coded
-            ], 201);
+            ], 200);
         }else
         {
-            return response()->json(["Error" => "El email ya existe"],400);
+            return response()->json(["Error" => "El email ya existe"],401);
         }
     }
 
@@ -178,21 +178,17 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request,$id)
     {
         $user_email = $request->data->email;
         
         $user = User::where('email', '=', $user_email)->first(); 
-      
-        if(isset($user))
-        {
-            $user->password = encrypt($request->password);
+    
+        return response()->json([
 
-            return response()->json(["Success" => $user],200);
-        }else
-        {
-            return response()->json(["Error" => "El ususario no existe"],401);
-        }
+            "name" => $user->name,
+            "email" => $user->email, 
+        ], 200);
     }
 
     /**
@@ -274,4 +270,48 @@ class UserController extends Controller
             return response()->json(["Error" => "El ususario no existe"]);
         }
     }
+
+    public function change_password(Request $request)
+    {
+        $user_email = $request->data->email;
+        
+        $request_user = User::where('email', $user_email)->first();
+
+        $current_password = decrypt($request_user->password);
+       
+        if($current_password == $request->new_password)
+        //var_dump($request->new_password);exit;
+        {
+            return response()->json([
+
+                "message" => "tiene que ser la contraseña distinta que la anterior", 
+    
+            ], 400);
+ 
+        }
+        
+        if($request->new_password == $request->new_password_again)
+        {
+            $request_user->password = encrypt($request->new_password);
+            $request_user->save();
+
+            return response()->json([
+
+                "message" => "nueva contrasena cambiada",
+                "new password" => $request->new_password,
+    
+            ], 200);
+
+        }else{
+            
+            return response()->json([
+
+                "message" => "no tienes permisos", 
+    
+            ], 400);
+
+        }
+
+    }
+
 }
