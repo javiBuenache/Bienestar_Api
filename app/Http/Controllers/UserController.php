@@ -178,7 +178,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request,$id)
+    public function show(Request $request)
     {
         $user_email = $request->data->email;
         
