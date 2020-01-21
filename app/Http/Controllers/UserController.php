@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Application;
 use App\Helpers\Token;
+use DateTime;
 
 
 class UserController extends Controller
@@ -55,8 +56,8 @@ class UserController extends Controller
         
         if (isset($user)) 
         {  
-            $newPassword = self::randomPassword();
-            self::sendEmail($user->email,$newPassword);
+            $newPassword = self::random_password();
+            self::send_email($user->email,$newPassword);
             $user->password = encrypt($newPassword);
             $user->update();
             return response()->json(["Success" => "contrasena nueva"],200);
@@ -65,16 +66,16 @@ class UserController extends Controller
             return response()->json(["Error" => "no existe email"],400);
         }
     }
-    public function sendEmail($email,$newPassword)
+    public function send_email($email,$new_password)
     {
         $to     =  $email;
         $subjet    = 'Recuperar contraseña';
-        $message   = 'Su nueva contrasena es: "'.$newPassword.'"';
+        $message   = 'Su nueva contrasena es: "'.$new_password.'"';
         //print($mensaje);exit();
         mail($to, $subjet, $message);
     }
     
-    public function randomPassword() 
+    public function random_password() 
     {
         $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwz1234567890';
         $pass = array(); 
@@ -89,31 +90,29 @@ class UserController extends Controller
 
     public function import_CSV(Request $request)
     {
-        $user_email = $request->data->email;
-        
-        $request_user = User::where('email', $user_email)->first();
        
-        $csv = array_map('str_getcsv', file('/Applications/MAMP/htdocs/CSV-Bienestar/usage.csv'));   
-        $array_number= count($csv);
-        //var_dump($csv); exit;
+        $csv = array_map('str_getcsv' ,file('/Applications/MAMP/htdocs/APIBienestapp/storage/app/usage.csv'));
+        $count_array = count($csv);
+
+        $user_email = $request->data->email;
+        $request_user = User::where('email', $user_email)->first();
         
-        foreach ($csv as $array_number => $column) 
-        {                 
-            if($array_number != 0)
-            {
-                $name = $column[1];          
-                $app = Application::where('name', '=', $name)->first();
-                  //var_dump($column[1]); exit;     
-                $request_user->apps()->attach(
-                    $app->id, 
-                [
-                    'date' => $column[0], 
-                    'event' => $column[2],                      
-                    'latitude' => $column[3],
-                    'longitude' => $column[4]
-                ]); 
-            }
+        for ($i=1; $i < $count_array ; $i++) 
+        { 
+            $open_date = new DateTime ($csv[$i][0]);
+            $app= $csv[$i][1];
+            $open_location = $csv[$i][3] . "," . $csv[$i][4];
+
+            $i++;
+
+            $close_date =  new DateTime ($csv[$i][0]);
+            // $timeUsed se guarda en segundos 
+            $time_used = $close_date->getTimestamp() - $open_date->getTimestamp();
+
+            $app = Application::where('name',$app)->first();
+
         }
+        return response()->json(["Success" => "tiempo de uso de las apps"]);
     }
 
     /**
@@ -228,7 +227,7 @@ class UserController extends Controller
  
         }
         
-        if($request->new_password == $request->new_password_again)
+        if($request->new_password == $request->repeat_new_password)
         {
             $request_user->password = encrypt($request->new_password);
             $request_user->save();
