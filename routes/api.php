@@ -21,7 +21,7 @@ Route::apiResource('applications', 'AppController');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::apiResource('users', 'UserController');
-    Route::get('show','UserController@show');
-    Route::post('change_password','UserController@change_password');
+    Route::get('show_data_user','UserController@show');
+    Route::post('update_password','UserController@update');
     
 }); 

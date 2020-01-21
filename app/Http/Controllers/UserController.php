@@ -39,7 +39,7 @@ class UserController extends Controller
             $coded_token = $token->encode();
             return response()->json([
                 
-                "token" => 'Usuario logueado: "'.$coded_token.'"',
+                "token" => $coded_token
             ], 200);
         }else
         {
@@ -209,36 +209,45 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $user_email = $request->data->email;
         
         $request_user = User::where('email', $user_email)->first();
 
-        $user_id = $request_user->id;
-
-        if($user_id!=$id)
+        $current_password = decrypt($request_user->password);
+       
+        if($current_password == $request->new_password)
+        //var_dump($request->new_password);exit;
         {
             return response()->json([
-                "message" => 'Error, solo puedes editar tu usuario'
-            ],401);
-        }
 
-        if($request->name==NULL || $request->email==NULL || $request->password==NULL)
+                "message" => "tiene que ser la contrasena distinta que la anterior", 
+    
+            ], 400);
+ 
+        }
+        
+        if($request->new_password == $request->new_password_again)
         {
+            $request_user->password = encrypt($request->new_password);
+            $request_user->save();
+
             return response()->json([
-                "message" => 'Debes rellenar todos los campos'
-            ],401);
+
+                "new password" => $request->new_password,
+    
+            ], 200);
+
+        }else{
+            
+            return response()->json([
+
+                "message" => "no tienes permisos", 
+    
+            ], 400);
+
         }
-
-        $request_user->name = $request->name;
-        $request_user->email = $request->email;
-        $request_user->password = encrypt($request->password);
-        $request_user->save();
-
-        return response()->json([
-            "message" => 'Actualizados los nuevos datos'
-        ],200);
     }
     
 
@@ -248,7 +257,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request)
     {
        $user_email = $request->data->email;
         
@@ -270,48 +279,4 @@ class UserController extends Controller
             return response()->json(["Error" => "El ususario no existe"]);
         }
     }
-
-    public function change_password(Request $request)
-    {
-        $user_email = $request->data->email;
-        
-        $request_user = User::where('email', $user_email)->first();
-
-        $current_password = decrypt($request_user->password);
-       
-        if($current_password == $request->new_password)
-        //var_dump($request->new_password);exit;
-        {
-            return response()->json([
-
-                "message" => "tiene que ser la contraseña distinta que la anterior", 
-    
-            ], 400);
- 
-        }
-        
-        if($request->new_password == $request->new_password_again)
-        {
-            $request_user->password = encrypt($request->new_password);
-            $request_user->save();
-
-            return response()->json([
-
-                "message" => "nueva contrasena cambiada",
-                "new password" => $request->new_password,
-    
-            ], 200);
-
-        }else{
-            
-            return response()->json([
-
-                "message" => "no tienes permisos", 
-    
-            ], 400);
-
-        }
-
-    }
-
 }
