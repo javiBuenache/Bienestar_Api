@@ -88,32 +88,7 @@ class UserController extends Controller
         return implode($pass);
     }
 
-    public function import_CSV(Request $request)
-    {
-       
-        $csv = array_map('str_getcsv' ,file('/Applications/MAMP/htdocs/APIBienestapp/storage/app/usage.csv'));
-        $count_array = count($csv);
-
-        $user_email = $request->data->email;
-        $request_user = User::where('email', $user_email)->first();
-        
-        for ($i=1; $i < $count_array ; $i++) 
-        { 
-            $open_date = new DateTime ($csv[$i][0]);
-            $app= $csv[$i][1];
-            $open_location = $csv[$i][3] . "," . $csv[$i][4];
-
-            $i++;
-
-            $close_date =  new DateTime ($csv[$i][0]);
-            // $timeUsed se guarda en segundos 
-            $time_used = $close_date->getTimestamp() - $open_date->getTimestamp();
-
-            $app = Application::where('name',$app)->first();
-
-        }
-        return response()->json(["Success" => "tiempo de uso de las apps"]);
-    }
+    
 
     /**
      * Display a listing of the resource.

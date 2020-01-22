@@ -4,11 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Application;
+use App\User;
 
 
 
 class AppController extends Controller
 {
+    public function import_CSV(Request $request)
+    {
+       
+        $csv = array_map('str_getcsv' ,file('/Applications/MAMP/htdocs/CSV-Bienestar/usage.csv'));
+        $count_array = count($csv);
+
+        $user = User::where('email', '=', $request->email)->first();
+
+        for ($i=0; $i < $count_array; $i++) 
+        { 
+          
+            $name = $csv[$i][1];
+            $app = Application::where('name', '=', $name)->first();
+            var_dump($app);exit;
+            $user->apps()->attach($app->id,
+            [
+                'date' => $csv[$i][0], 
+                'event' => $csv[$i][2],                      
+                'latitude' => $csv[$i][3],
+                'longitude' => $csv[$i][4],
+            ]);
+        }
+}
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +67,7 @@ class AppController extends Controller
         {
             $application->register_app($request);
 
-            return response()->json(["Success" => "Se ha añadido la aplicacion."],200);
+            return response()->json(["Success" => "Se ha anadido la aplicacion."],200);
         }else
         {
             return response()->json(["Error" => "La aplicacion ya existe"],401);
