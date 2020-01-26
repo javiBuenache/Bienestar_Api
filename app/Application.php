@@ -37,18 +37,4 @@ class Application extends Model
         $applications = self::all();
         return $applications;
     }
-
-    public function users()
-    {
-        return $this->belongsToMany('App\User', 'user_have_applications')
-                    ->withPivot('date', 'event', 'latitude', 'longitude') 
-                    ->withTimestamps();                    
-    }
-    
-    public function users_usages()
-    {
-        return $this->belongsToMany('App\Application', 'user_usage_applications')
-                    ->withPivot('max_time', 'start_time', 'finish_time') 
-                    ->withTimestamps();
-    }
 }

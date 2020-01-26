@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Helpers\Token;
+
 
 class User extends Model
 {
@@ -51,19 +51,5 @@ class User extends Model
         }
         $data = $token->decode($header);
         return !empty(self::by_field('email', $data->email));
-    }
-
-
-    public function apps()
-    {
-        return $this->belongsToMany('App\Application', 'user_have_applications')
-                    ->withPivot('date', 'event', 'latitude', 'longitude')                    
-                    ->withTimestamps();
-    }
-    public function usages_apps()
-    {
-        return $this->belongsToMany('App\Application', 'user_usage_applications')
-                    ->withPivot('max_time', 'start_time', 'finish_time') 
-                    ->withTimestamps();
     }
 }

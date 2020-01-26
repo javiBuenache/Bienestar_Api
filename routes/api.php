@@ -17,11 +17,13 @@ use Illuminate\Http\Request;
 Route::post('register', 'UserController@store');
 Route::post('login','UserController@login');
 Route::post('recuperate_password','UserController@recuperate_password');
-Route::apiResource('applications', 'AppController');
-Route::post('import_CSV', 'AppController@import_CSV');
+
 
 Route::group(['middleware' => ['auth']], function () {
     Route::apiResource('users', 'UserController');
+    Route::apiResource('applications','AppController');
+	Route::apiResource('restriction','RestrictionController');
+	Route::apiResource('usage','UsageController');
     Route::get('show_data_user','UserController@show');
     Route::post('update_password','UserController@update');
     
