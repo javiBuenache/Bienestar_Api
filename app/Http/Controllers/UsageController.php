@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use DB;
+
 use Illuminate\Http\Request;
 use DateTime;
 use App\Usage;
@@ -73,7 +73,7 @@ class UsageController extends Controller
             {
 
                 $newUsage = new usage();
-                $newUsage->register_usage($openDate,$timeUsed,$openLocation,$user->id,$application->id);   
+                $newUsage->register_usage($openDate,$timeUsed,$openLocation,$request_user->id,$application->id);   
             }               
         }
         return response()->json(["Success" => "Se ha añadido el uso de todas las aplicaciones"]);
@@ -91,7 +91,7 @@ class UsageController extends Controller
         $request_user = User::where('email', $user_email)->first();
 
         $usage = new Usage();        
-        $usages = $usage->get_usage($user->id);
+        $usages = $usage->get_usage($request_user->id);
 
         //var_dump($usages);exit();
     }

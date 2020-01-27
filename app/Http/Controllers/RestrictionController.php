@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Application;
 use App\Restriction;
-use App\Helpers\Token;
+
 
 class RestrictionController extends Controller
 {
@@ -89,7 +89,7 @@ class RestrictionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Reques $request, $id)
+    public function show(Request $request, $id)
     {
         
         $user_email = $request->data->email;
