@@ -57,7 +57,7 @@ class AppController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
         $application = new Application();
         $applications = $application->get_App();
@@ -65,9 +65,9 @@ class AppController extends Controller
         if(isset($applications))
         {
            
-            return response()->json(["Success" => $applications]);
+            return response()->json($applications,200);
         }else{
-            return response()->json(["Error" => "No hay aplicaciones"]);
+            return response()->json(["Error" => "No hay aplicaciones"],400);
         }
     }
 
