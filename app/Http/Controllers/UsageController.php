@@ -9,6 +9,9 @@ use DateTime;
 use App\Usage;
 use App\User;
 use App\Application;
+use ArrayObject;
+use stdClass;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 
 class UsageController extends Controller
@@ -52,7 +55,7 @@ class UsageController extends Controller
                     $usage->use_time = $time_used;
 
                     $usage->user_id= $user->id;
-                    $usage->aplication_id = $currentapp->id;
+                    $usage->application_id = $currentapp->id;
                     $usage->save();
                 }
             }
@@ -119,9 +122,9 @@ class UsageController extends Controller
         $apps = Application::all();
 
         $usages = Usage::whereRaw("WEEK(date) = $requestedDate")
-            ->select('user_id', 'aplication_id',DB::raw("SUM(use_time) as total_time"))
+            ->select('user_id', 'application_id',DB::raw("SUM(use_time) as total_time"))
             ->where('user_id', $user->id)
-            ->groupBy('user_id','aplication_id','use_time')
+            ->groupBy('user_id','application_id','use_time')
             ->get();
 
         $time_help = 0; 
@@ -129,7 +132,7 @@ class UsageController extends Controller
 
         foreach ($apps as $key => $app) {
             foreach ($usages as $key => $usage) {
-                if ($app->id == $usage->aplication_id) {
+                if ($app->id == $usage->application_id) {
                     $time_help += $usage->total_time;
                 }
             }
@@ -147,9 +150,9 @@ class UsageController extends Controller
         $requestedDate = $requestedDate->format('m');
 
         $usages = Usage::whereRaw("MONTH(date) = $requestedDate")
-            ->select('user_id','aplication_id',DB::raw("SUM(use_time) as total_time"))
+            ->select('user_id','application_id',DB::raw("SUM(use_time) as total_time"))
             ->where('user_id', $user->id)
-            ->groupBy('user_id','aplication_id','use_time')
+            ->groupBy('user_id','application_id','use_time')
             ->get();
             
             $time_help = 0; 
@@ -159,7 +162,7 @@ class UsageController extends Controller
             {
                 foreach ($usages as $key => $usage) 
                 {
-                    if ($app->id == $usage->aplication_id) 
+                    if ($app->id == $usage->application_id) 
                     {
                         $time_help += $usage->total_time;
                     }
@@ -179,9 +182,9 @@ class UsageController extends Controller
         $requestedDate = $requestedDate->format('Y');
 
         $usages = Usage::whereRaw("YEAR(date) = $requestedDate")
-            ->select('user_id','aplication_id',DB::raw("SUM(use_time) as total_time"))
+            ->select('user_id','application_id',DB::raw("SUM(use_time) as total_time"))
             ->where('user_id', $user->id)
-            ->groupBy('user_id','aplication_id','use_time')
+            ->groupBy('user_id','application_id','use_time')
             ->get();
             
             $time_help = 0; 
@@ -191,7 +194,7 @@ class UsageController extends Controller
             {
                 foreach ($usages as $key => $usage) 
                 {
-                    if ($app->id == $usage->aplication_id)
+                    if ($app->id == $usage->application_id)
                      {
                         $time_help += $usage->total_time;
                     }
@@ -231,7 +234,7 @@ class UsageController extends Controller
         {
             if ($usage->date == $date) 
             {   
-                $app = Application::where('id', $usage->aplication_id)->first();
+                $app = Application::where('id', $usage->application_id)->first();
                 array_push($names, $app->name);
                 array_push($icons, $app->icon);   
                 $time_help += $usage->total_time;
