@@ -16,9 +16,9 @@ class CreateRestrictionsTable extends Migration
         Schema::create('restrictions', function (Blueprint $table) 
         {
             $table->increments('id');
-            $table->Time('max_time')->nullable();
-            $table->dateTime('start_hour_restriction')->nullable();
-            $table->dateTime('finish_hour_restriction')->nullable();
+            $table->integer('max_time')->nullable();
+            $table->time('start_hour_restriction')->nullable();
+            $table->time('finish_hour_restriction')->nullable();
 
             $table->Integer('user_id')->unsigned();
             $table->Integer('application_id')->unsigned();

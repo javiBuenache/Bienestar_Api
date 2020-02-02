@@ -64,13 +64,13 @@ class RestrictionController extends Controller
                     {     
 
                         $restriction->register_restriction($request,$user->id,$application->id);
-                        return response()->json(["Success" => "Se ha añadido la restriction"]);
+                        return response()->json(["Success" => "Se ha añadido la restriction"],201);
 
                     }
                 }else{
 
                     $restriction->register_restriction($request,$user->id,$application->id);
-                    return response()->json(["Success" => "Se ha añadido la restriction"]);
+                    return response()->json(["Success" => "Se ha añadido la restriction"],201);
                 }
 
             }else{
