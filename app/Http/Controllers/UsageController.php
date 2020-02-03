@@ -9,10 +9,6 @@ use DateTime;
 use App\Usage;
 use App\User;
 use App\Application;
-use ArrayObject;
-use stdClass;
-use Symfony\Component\VarDumper\Cloner\Data;
-
 
 class UsageController extends Controller
 {
@@ -56,6 +52,8 @@ class UsageController extends Controller
 
                     $usage->user_id= $user->id;
                     $usage->application_id = $currentapp->id;
+
+
                     $usage->save();
                 }
             }
