@@ -26,10 +26,10 @@ Route::group(['middleware' => ['auth']], function ()
     Route::apiResource('users', 'UserController');
     Route::apiResource('applications','AppController');
 	Route::post('restriction','RestrictionController@store');
-    Route::apiResource('usage','UsageController');
+   
     Route::get('show_apps','AppController@show');
-    Route::get('show_locations', 'UsageController@show_locations');
     Route::get('show_data_user','UserController@show');
+    Route::get('show_locations','UsageController@show_locations');
     Route::post('update_password','UserController@update');
     
 }); 

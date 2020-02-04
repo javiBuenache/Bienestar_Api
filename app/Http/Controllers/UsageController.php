@@ -60,6 +60,28 @@ class UsageController extends Controller
         }
         return response()->json(["Message"=> "Datos importados"], 200);
     }
+
+    public function show_locations(Request $request)
+    {
+        
+        $user_email = $request->data->email;
+        
+        $user = User::where('email', '=', $user_email)->first(); 
+
+        $user_id = $user->id;
+
+        $location= DB::table('usages')
+        ->select('latitude', 'longitude')
+        ->distinct()
+        ->get();
+
+        return response()->json(
+            $location
+        ,201);
+    }
+    
+
+
     /**
      * Display a listing of the resource.
      *
