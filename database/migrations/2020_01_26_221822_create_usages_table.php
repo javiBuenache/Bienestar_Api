@@ -19,8 +19,8 @@ class CreateUsagesTable extends Migration
             $table->date('date');
             $table->Integer('use_time');
             $table->string('event');
-            $table->double('latitude', 8, 6);
-            $table->double('longitude', 8, 6);
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
 
             $table->Integer('user_id')->unsigned();
             $table->Integer('application_id')->unsigned();

@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 Route::post('register', 'UserController@store');
 Route::post('login','UserController@login');
 Route::post('recuperate_password','UserController@recuperate_password');
-
 Route::post('import_CSV', 'UsageController@import_CSV');
 
 
@@ -27,9 +26,10 @@ Route::group(['middleware' => ['auth']], function ()
     Route::apiResource('applications','AppController');
 	Route::post('restriction','RestrictionController@store');
    
-    Route::get('show_apps','AppController@show');
+    //Route::get('show_apps','AppController@show');
     Route::get('show_data_user','UserController@show');
     Route::get('show_locations','UsageController@show_locations');
+    Route::get('show_apps','UsageController@show');
     Route::post('update_password','UserController@update');
     
 }); 

@@ -20,4 +20,5 @@ class Usage extends Model
                                         ->get();
         return $usages;
     }
+
 }

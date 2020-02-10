@@ -10,8 +10,11 @@ use App\Usage;
 use App\User;
 use App\Application;
 
+
+
 class UsageController extends Controller
 {
+   
     public function import_CSV(Request $request)
     {
         $user_email = $request->email;
@@ -49,11 +52,8 @@ class UsageController extends Controller
                     $date_close = $date;
                     $time_used = $date_close->getTimestamp() - $date_opens->getTimestamp();
                     $usage->use_time = $time_used;
-
                     $usage->user_id= $user->id;
                     $usage->application_id = $currentapp->id;
-
-
                     $usage->save();
                 }
             }
@@ -65,23 +65,22 @@ class UsageController extends Controller
     {
         
         $user_email = $request->data->email;
-        
-        $user = User::where('email', '=', $user_email)->first(); 
 
-        $user_id = $user->id;
+        $user = User::where('email', $user_email)->first();
 
-        $location= DB::table('usages')
-        ->select('latitude', 'longitude')
-        ->distinct()
-        ->get();
+        $usages = Usage::where('user_id',$user->id)->get();
 
-        return response()->json(
-            $location
-        ,201);
+        $array_latitude = array();
+        $array_longitude = array();
+
+        for ($i=0; $i < count($usages); $i++) 
+        { 
+                array_push($array_latitude, $usages[$i]->latitude);
+                array_push($array_longitude, $usages[$i]->longitude);
+        }
+
+        return response()->json(["latitude"=> $array_latitude, "longitude"=> $array_longitude], 200);
     }
-    
-
-
     /**
      * Display a listing of the resource.
      *
@@ -121,9 +120,162 @@ class UsageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show()
+
+    public function show(Request $request)
+    {
+        $user_email = $request->data->email;
+        $user = User::where('email',$user_email)->first();  
+        
+        $usage = new Usage();
+        $usages = $usage->get_usage($user->id);
+
+        $date = new DateTime();
+        $date = $date->format('Y-m-d');
+
+        $apps = Application::all();
+
+        $today_time = array();
+        
+        $names = array();
+        $icons = array();
+
+        $time = 0;
+        foreach ($usages as $key => $usage) 
+        {
+            if ($usage->date == $date) 
+            {   
+                $app = Application::where('id', $usage->application_id)->first();
+                array_push($names, $app->name);
+                array_push($icons, $app->icon);   
+                $time += $usage->total_time;
+                array_push($today_time, $time); 
+                $time = 0;
+            }
+        }
+        if (count($names) < count($apps)) 
+        {
+            foreach ($apps as $key => $app) 
+            {
+                if (isset($names[$key])) 
+                {
+                    if ($app->name != $names[$key]) 
+                    {
+                        array_push($names, $app->name);
+                        array_push($icons, $app->icon);   
+                        array_push($today_time, $time); 
+                    }
+                }
+                else
+                {
+                        array_push($names, $app->name);
+                        array_push($icons, $app->icon);   
+                        array_push($today_time, $time); 
+                }
+                
+            }
+        }
+        $week_time = $this->get_use_week($user);
+        $month_time = $this->get_use_month($user);
+        $all_time = $this->get_use_all($user);
+    return response()->json(["names"=> $names, "icons"=> $icons, "today_time" => $today_time, "week_time" => $week_time, "month_time" => $month_time, "all_time" => $all_time], 200);
+    }
+
+    public function get_use_week($user)
     {
        
+
+        $requestDate = New DateTime();
+        //Expresión en días del año
+        $requestDate = $requestDate->format('W')-1;
+
+        $apps = Application::all();
+
+        $usages = Usage::whereRaw("WEEK(date) = $requestDate")
+            ->select('user_id','application_id',DB::raw("SUM(use_time) as total_time"))
+            ->where('user_id', $user->id)
+            ->groupBy('user_id','application_id','use_time')
+            ->get();
+            
+            $time = 0; 
+            $total_time = array();
+    
+            foreach ($apps as $key => $app) 
+            {
+                foreach ($usages as $key => $usage) 
+                {
+                    if ($app->id == $usage->application_id) 
+                    {
+                        $time += $usage->total_time;
+                    }
+                }
+                array_push($total_time, $time);
+                $time = 0;
+            }
+        return $total_time;
+    }
+
+    public function get_use_month($user)
+    {
+        $apps = Application::all();
+
+        $requestDate = New DateTime();
+        //Expresión en días del año
+        $requestDate = $requestDate->format('m');
+
+        $usages = Usage::whereRaw("MONTH(date) = $requestDate")
+            ->select('user_id','application_id',DB::raw("SUM(use_time) as total_time"))
+            ->where('user_id', $user->id)
+            ->groupBy('user_id','application_id','use_time')
+            ->get();
+            
+            $time = 0; 
+            $total_time = array();
+    
+            foreach ($apps as $key => $app) 
+            {
+                foreach ($usages as $key => $usage) 
+                {
+                    if ($app->id == $usage->application_id) 
+                    {
+                        $time += $usage->total_time;
+                    }
+                }
+                array_push($total_time, $time);
+                $time = 0;
+            }
+        return $total_time;
+    }
+
+    public function get_use_all($user)
+    {
+        $apps = Application::all();
+
+        $requestDate = New DateTime();
+        //Expresión en días del año
+        $requestDate = $requestDate->format('Y');
+
+        $usages = Usage::whereRaw("YEAR(date) = $requestDate")
+            ->select('user_id','application_id',DB::raw("SUM(use_time) as total_time"))
+            ->where('user_id', $user->id)
+            ->groupBy('user_id','application_id','use_time')
+            ->get();
+            
+            $time = 0; 
+            $total_time = array();
+    
+            foreach ($apps as $key => $app)
+             {
+                foreach ($usages as $key => $usage) 
+                {
+                    if ($app->id == $usage->application_id) 
+                    {
+                        $time += $usage->total_time;
+                    }
+                }
+                array_push($total_time, $time);
+                $time = 0;
+            }
+        return $total_time;
     }
 
     /**
